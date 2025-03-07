@@ -78,10 +78,12 @@ services:
     networks:
       - localnet
 
-  payment_system:
+  payment-system:
     build:
       context: .
       dockerfile: dockerfile.payment_system
+    hostname: payment-system
+    container_name: payment-system
     depends_on:
       kafka:
         condition: service_healthy
