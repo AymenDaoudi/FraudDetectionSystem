@@ -1,0 +1,99 @@
+name: fraud-detection
+
+services:
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    env_file:
+      - path: ./shared/kafka/zookeeper/.env
+    healthcheck:
+      test: nc -z localhost 2181
+      interval: 10s
+      timeout: 20s
+      retries: 5
+    networks:
+      - localnet
+
+  kafka:
+    build: 
+      context: ./shared/kafka/kafka-broker
+      dockerfile: dockerfile
+    hostname: kafka
+    container_name: kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    restart: always
+    env_file:
+      - path: ./shared/kafka/kafka-broker/.env
+    healthcheck:
+      test: ["CMD", "/etc/confluent/docker/healthcheck.sh"]
+      interval: 10s
+      timeout: 20s
+      retries: 5
+    networks:
+      - localnet
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:latest
+    hostname: schema-registry
+    container_name: schema-registry
+    depends_on:
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8081:8081"
+    restart: always
+    env_file:
+      - path: ./shared/kafka/kafka-schema-registry/.env
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail http://localhost:8081/subjects || exit 1"]
+      interval: 10s
+      timeout: 20s
+      retries: 5
+    networks:
+      - localnet
+
+  control-center:
+    image: confluentinc/cp-enterprise-control-center:latest
+    hostname: control-center
+    container_name: control-center
+    depends_on:
+      schema-registry:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    ports:
+      - "9021:9021"
+    restart: always
+    env_file:
+      - path: ./shared/kafka/kafka-control-center/.env
+    networks:
+      - localnet
+
+  payment_system:
+    build:
+      context: .
+      dockerfile: dockerfile.payment_system
+    depends_on:
+      kafka:
+        condition: service_healthy
+      schema-registry:
+        condition: service_healthy
+    environment:
+      SIM_DURATION: 1000.0
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      CHARGING_EVENTS_TOPIC: payments
+    networks:
+      - localnet
+
+networks:
+  localnet:
+    driver: bridge

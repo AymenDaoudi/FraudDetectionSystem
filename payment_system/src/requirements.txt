@@ -1,0 +1,3 @@
+simpy
+kafka-python
+pydantic

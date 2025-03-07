@@ -1,0 +1,20 @@
+FROM python:slim
+
+ENV SIM_DURATION=1000.0
+ENV KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+ENV CHARGING_EVENTS_TOPIC=payments
+
+# Add the app directory to Python path
+ENV PYTHONPATH=/app
+
+# Working directory inside the container
+WORKDIR /app
+
+# Copy your application code
+COPY ./payment_system/src ./app/src
+COPY ./shared ./app/src/shared
+
+RUN pip install --no-cache-dir -r ./app/src/requirements.txt
+
+# Set the entrypoint / default command to run
+CMD ["python", "app/src/main.py"]
