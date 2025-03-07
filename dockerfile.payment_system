@@ -6,6 +6,7 @@ ENV CHARGING_EVENTS_TOPIC=payments
 
 # Add the app directory to Python path
 ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
 
 # Working directory inside the container
 WORKDIR /app

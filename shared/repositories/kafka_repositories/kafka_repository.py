@@ -56,7 +56,8 @@ class KafkaRepository:
                 "price": message.price
             }
             # Let the producer's value_serializer handle the serialization
-            self.kafka_config.producer.send(topic, value=message_dict)
+            self.kafka_config.producer.send(topic, value=message_dict, key=message_dict["operation_id"].encode("utf-8"))
+
         except Exception as e:
             print(f"Error publishing message: {e}")
             raise

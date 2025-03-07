@@ -1,4 +1,5 @@
 import os
+import sys
 from payment_system import PaymentSystem
 from shared.repositories.kafka_repositories.kafka_repository import KafkaRepository
 from shared.repositories.kafka_repositories.kafka_config import KafkaConfig
@@ -6,6 +7,8 @@ from shared.repositories.kafka_repositories.kafka_config import KafkaConfig
 KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS","kafka:29092")
 
 def main():
+    
+    print(f"Starting payment service...")
 
     kafka_config = KafkaConfig(KAFKA_BOOTSTRAP_SERVERS)
     kafka_repository = KafkaRepository(kafka_config)

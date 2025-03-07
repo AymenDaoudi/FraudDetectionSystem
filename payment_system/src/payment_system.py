@@ -9,16 +9,17 @@ class PaymentSystem:
         self.kafka_repository = kafka_repository
     
     def generate_payments(self):
-        env = simpy.Environment()
+
+        self.kafka_repository.ensure_topic_exists("payments")
         
+        env = simpy.Environment()
+
         for _ in range(1000):
             env.process(self.initiate_payment(env))
             
         env.run()
             
     def initiate_payment(self, env):
-        
-        self.kafka_repository.ensure_topic_exists("payments")
 
         while True:
             user_id : str | None = str(uuid.uuid4()) if random.randint(0, 1) == 1 else None
