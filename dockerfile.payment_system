@@ -12,8 +12,11 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 # Copy your application code
-COPY ./payment_system/src ./app/src
-COPY ./shared ./app/src/shared
+COPY ./shared/entities ./app/src/shared/entities
+COPY ./shared/repositories ./app/src/shared/repositories
+COPY ./payment_system/src/main.py ./app/src
+COPY ./payment_system/src/payment_system.py ./app/src
+COPY ./payment_system/src/requirements.txt ./app/src
 
 RUN pip install --no-cache-dir -r ./app/src/requirements.txt
 
