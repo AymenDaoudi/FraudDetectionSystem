@@ -1,0 +1,4 @@
+{
+    "schema": "{ \"type\": \"record\", \"name\": \"Payment\", \"fields\": [ { \"name\": \"operation_id\", \"type\": { \"type\": \"string\", \"logicalType\": \"uuid\" } }, { \"name\": \"user_id\", \"type\": { \"type\": \"string\", \"logicalType\": \"uuid\" } }, { \"name\": \"date\", \"type\": { \"type\": \"long\", \"logicalType\": \"timestamp-millis\" } }, { \"name\": \"price\", \"type\": { \"type\": \"bytes\", \"logicalType\": \"decimal\", \"precision\": 10, \"scale\": 2 } } ] }"
+}
+  

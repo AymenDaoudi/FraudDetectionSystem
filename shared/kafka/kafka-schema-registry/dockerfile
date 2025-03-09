@@ -1,0 +1,17 @@
+FROM confluentinc/cp-schema-registry:latest
+
+USER root
+
+ENV SCHEMA_REGISTRY_HOST_NAME='schema-registry'
+ENV SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS='kafka:29092'
+ENV SCHEMA_REGISTRY_LISTENERS='http://0.0.0.0:8081'
+
+COPY register_schemas.sh /etc/confluent/docker/
+COPY entrypoint.sh /etc/confluent/docker/
+
+RUN chmod +x /etc/confluent/docker/register_schemas.sh
+RUN chmod +x /etc/confluent/docker/entrypoint.sh
+
+USER 1001
+
+ENTRYPOINT ["/etc/confluent/docker/entrypoint.sh"]

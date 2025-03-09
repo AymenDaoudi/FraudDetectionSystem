@@ -1,3 +1,9 @@
 simpy
 kafka-python
 pydantic
+confluent-kafka
+httpx
+attrs
+cachetools
+authlib
+fastavro

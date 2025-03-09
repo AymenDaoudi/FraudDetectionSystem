@@ -2,6 +2,7 @@ FROM python:slim
 
 ENV SIM_DURATION=1000.0
 ENV KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+ENV SCHEMA_REGISTRY_URL=http://schema-registry:8081
 ENV CHARGING_EVENTS_TOPIC=payments
 
 # Add the app directory to Python path
@@ -14,6 +15,7 @@ WORKDIR /app
 # Copy your application code
 COPY ./shared/entities ./app/src/shared/entities
 COPY ./shared/repositories ./app/src/shared/repositories
+COPY ./shared/kafka/kafka-schema-registry/payment.avsc ./app/src
 COPY ./payment_system/src/main.py ./app/src
 COPY ./payment_system/src/payment_system.py ./app/src
 COPY ./payment_system/src/requirements.txt ./app/src

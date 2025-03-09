@@ -61,6 +61,24 @@ services:
     networks:
       - localnet
 
+  schemas-registrar:
+    build:
+      context: ./shared/kafka/kafka-schemas-registrar
+      dockerfile: dockerfile
+    hostname: schemas-registrar
+    container_name: schemas-registrar
+    depends_on:
+      schema-registry:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://schema-registry:8081/subjects"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: on-failure:3
+    networks:
+      - localnet
+
   control-center:
     image: confluentinc/cp-enterprise-control-center:latest
     hostname: control-center
