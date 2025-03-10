@@ -111,6 +111,26 @@ services:
       SIM_DURATION: 1000.0
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       CHARGING_EVENTS_TOPIC: payments
+    healthcheck:
+      test: ["CMD", "echo", "1"]
+      interval: 10s
+      timeout: 20s
+      retries: 5
+    networks:
+      - localnet
+
+  fraud-detector:
+    build:
+      context: ./fraud_detector
+      dockerfile: Dockerfile
+    hostname: fraud-detector
+    container_name: fraud-detector
+    depends_on:
+      payment-system:
+        condition: service_healthy
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SCHEMA_REGISTRY_URL: http://schema-registry:8081
     networks:
       - localnet
 

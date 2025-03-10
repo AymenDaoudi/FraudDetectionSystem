@@ -12,10 +12,7 @@
     },
     {
       "name": "user_id",
-      "type": {
-        "type": "string",
-        "logicalType": "uuid"
-      }
+      "type": "string"
     },
     {
       "name": "date",

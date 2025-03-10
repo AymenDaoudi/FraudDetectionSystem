@@ -7,7 +7,7 @@ from kafka.errors import TopicAlreadyExistsError, NoBrokersAvailable, UnknownTop
 
 from shared.repositories.kafka_repositories.kafka_config import KafkaConfig
 from shared.entities.payment import Payment
-
+from decimal import Decimal
 
 import uuid
 import time
@@ -51,9 +51,9 @@ class KafkaRepository:
             self.kafka_config.admin_client.close()
             
     # Convert Decimal to bytes (Big Endian)
-    def decimal_to_bytes(self, value: float, precision=10, scale=2):
+    def decimal_to_bytes(self, value: Decimal, precision=10, scale=2):
         # Convert the float to a Decimal for precision
-        dec_value = decimal.Decimal(str(value))
+        dec_value = Decimal(str(value))
         
         # Scale the value (e.g., for 2 decimal places, multiply by 100)
         unscaled_value = int(dec_value * (10 ** scale))
@@ -86,13 +86,14 @@ class KafkaRepository:
         try:
             # Create message dictionary
             message_dict = {
-                "operation_id": message.operation_id,
+                "transaction_id": message.transaction_id,
                 "user_id": message.user_id,
                 "date": message.date.isoformat(),
-                "price": message.price
+                "nb_of_items": message.nb_of_items,
+                "total_amount": message.total_amount
             }
             # Let the producer's value_serializer handle the serialization
-            self.kafka_config.producer.send(topic, value=message_dict, key=message_dict["operation_id"].encode("utf-8"))
+            self.kafka_config.producer.send(topic, value=message_dict, key=message_dict["transaction_id"].encode("utf-8"))
             #self.kafka_config.producer.flush()
 
         except Exception as e:
@@ -103,13 +104,14 @@ class KafkaRepository:
         try:
             # Produce a message
             payment_dict = {
-                "operation_id": str(message.operation_id),  # Generate UUID
+                "transaction_id": str(message.transaction_id),  # Generate UUID
                 "user_id": str(message.user_id),       # Generate UUID
                 "date": message.date.timestamp() * 1000,    # Timestamp in millis
-                "price": self.decimal_to_bytes(message.price)  # Convert Decimal to bytes
+                "nb_of_items": message.nb_of_items,
+                "total_amount": self.decimal_to_bytes(message.total_amount)  # Convert Decimal to bytes
             }
 
-            self.kafka_config.avro_producer.produce(topic=topic, key=message.operation_id, value=payment_dict, on_delivery=self.delivery_report)
+            self.kafka_config.avro_producer.produce(topic=topic, key=message.transaction_id, value=payment_dict, on_delivery=self.delivery_report)
 
             # Flush messages
             self.kafka_config.avro_producer.flush()
